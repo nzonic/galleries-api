@@ -68,7 +68,10 @@ class AuthController extends Controller
      */
     public function refresh()
     {
-        return $this->respondWithToken(auth()->refresh());
+        $token = auth()->refresh();
+        return [
+            'token' => $token
+        ];
     }
 
     public function register(RegisterRequest $request)
