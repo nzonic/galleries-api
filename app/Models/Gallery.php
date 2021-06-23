@@ -11,7 +11,13 @@ class Gallery extends Model
 
     protected $guarded = [ 'id' ];
 
-    public function images() {
+    public function images()
+    {
         return $this->hasMany(Image::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

@@ -10,7 +10,8 @@ class Image extends Model
 
     protected $guarded = [ 'id' ];
 
-    public function gallery() {
+    public function gallery()
+    {
         return $this->belongsTo(Gallery::class);
     }
 }
