@@ -1,26 +1,20 @@
 <?php
 
 namespace App\Http\Controllers;
-
-use Illuminate\Http\Request;
-use App\Models\Gallery;
 use App\Models\User;
-class GalleriesController extends Controller
+use App\Models\Gallery;
+use Illuminate\Http\Request;
+
+class AuthorController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
-        $pageSize = $request->query('PAGE_SIZE', 10);
-        $search = $request->query('search', '');
-        $id = $request->query('userId', 0);
-        if ($id > 0) {
-            return User::findOrFail($id)->galleries()->search($search)->orderBy('created_at', 'DESC')->paginate($pageSize);
-        }
-        return Gallery::search($search)->orderBy('created_at', 'DESC')->paginate($pageSize);
+        //
     }
 
     /**
@@ -50,9 +44,12 @@ class GalleriesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Gallery $gallery)
+    public function show(User $user, Request $request)
     {
-        return $gallery;
+        return response([
+            'author' => $user,
+            'galleries' => $user->galleries()->orderBy('created_at', 'DESC')->paginate()
+        ]);
     }
 
     /**
