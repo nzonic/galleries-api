@@ -48,7 +48,7 @@ class AuthorController extends Controller
     {
         return response([
             'author' => $user,
-            'galleries' => $user->galleries()->orderBy('created_at', 'DESC')->paginate()
+            'galleries' => $user->galleries()->withOnly(['user', 'images'])->orderBy('created_at', 'DESC')->paginate(10)
         ]);
     }
 

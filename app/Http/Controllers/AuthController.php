@@ -17,7 +17,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'unauthorizedRedirect', 'register']]);
+        $this->middleware('auth:api', ['except' => ['login', 'unauthorizedRedirect', 'register', 'refresh']]);
     }
 
     /**
@@ -69,9 +69,7 @@ class AuthController extends Controller
     public function refresh()
     {
         $token = auth()->refresh();
-        return [
-            'token' => $token
-        ];
+        return $this->respondWithToken($token);
     }
 
     public function register(RegisterRequest $request)

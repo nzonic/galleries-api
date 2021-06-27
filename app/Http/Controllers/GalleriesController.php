@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Gallery;
 use App\Models\User;
+use App\Rules\ArrayAtLeastOneRequired;
+use App\Http\Requests\GalleryRequest;
 class GalleriesController extends Controller
 {
     /**
@@ -18,9 +20,9 @@ class GalleriesController extends Controller
         $search = $request->query('search', '');
         $id = $request->query('userId', 0);
         if ($id > 0) {
-            return User::findOrFail($id)->galleries()->search($search)->orderBy('created_at', 'DESC')->paginate($pageSize);
+            return User::findOrFail($id)->galleries()->withOnly(['user', 'images'])->search($search)->orderBy('created_at', 'DESC')->paginate($pageSize);
         }
-        return Gallery::search($search)->orderBy('created_at', 'DESC')->paginate($pageSize);
+        return Gallery::withOnly(['user', 'images'])->search($search)->orderBy('created_at', 'DESC')->paginate($pageSize);
     }
 
     /**
@@ -39,9 +41,16 @@ class GalleriesController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(GalleryRequest $request)
     {
-        //
+        $data = $request->validated();
+        $user = User::find(auth()->id());
+        $gallery = $user->galleries()->create($data);
+        // $gallery->images()->saveMany($request->input('images'));
+        foreach ($request->input('images') as $key => $data) {
+            $gallery->images()->create($data);
+        }
+        return $gallery;
     }
 
     /**
@@ -73,9 +82,17 @@ class GalleriesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(GalleryRequest $request, Gallery $gallery)
     {
-        //
+        $data = $request->validated();
+        $gallery->update($request->except('images'));
+        $gallery->images()->delete();
+        foreach ($request->input('images') as $value) {
+            unset($value['created_at']);
+            unset($value['updated_at']);
+            $gallery->images()->updateOrCreate($value);
+        }
+        return $gallery;
     }
 
     /**
@@ -84,8 +101,9 @@ class GalleriesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Gallery $gallery)
     {
-        //
+        $gallery->delete();
+        return response('Successfully Deleted', 200);
     }
 }

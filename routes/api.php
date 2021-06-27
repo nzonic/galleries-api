@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GalleriesController;
 use App\Http\Controllers\AuthorController;
+use App\Http\Controllers\CommentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -33,4 +34,10 @@ Route::group([
     Route::get('/galleries', [GalleriesController::class, 'index'])->name('index');
     Route::get('/galleries/{gallery}', [GalleriesController::class, 'show']);
     Route::get('/users/{user}', [AuthorController::class, 'show']);
+    Route::post('/create', [GalleriesController::class, 'store'])->middleware('auth');
+    Route::put('/edit/{gallery}', [GalleriesController::class, 'update'])->middleware('auth');
+    Route::delete('/delete/{gallery}', [GalleriesController::class, 'destroy'])->middleware('auth');
+    Route::post('/add-comment/{gallery}', [CommentController::class, 'store'])->middleware('auth');
+    Route::get('/comments/{gallery}', [CommentController::class, 'show'])->middleware('auth');
+    Route::delete('/delete-comment/{comment}', [CommentController::class, 'destroy'])->middleware('auth');
 });
